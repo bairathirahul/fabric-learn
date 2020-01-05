@@ -1,0 +1,23 @@
+peer channel create -o $CORE_ORDERER_ADDRESS -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx --tls --cafile $CORE_ORDERER_CA --outputBlock ./channel-artifacts/cert.block
+
+peer channel join -b ./channel-artifacts/cert.block
+export CORE_PEER_ADDRESS=peer1.org1.com:7051
+peer channel join -b ./channel-artifacts/cert.block
+export CORE_PEER_ADDRESS=peer0.org1.com:7051
+peer channel update -o $CORE_ORDERER_ADDRESS -c $CHANNEL_NAME -f ./channel-artifacts/Org1MSPanchors.tx --tls --cafile $CORE_ORDERER_CA
+
+peer channel join -b ./channel-artifacts/cert.block
+export CORE_PEER_ADDRESS=peer1.org2.com:7051
+peer channel join -b ./channel-artifacts/cert.block
+export CORE_PEER_ADDRESS=peer0.org2.com:7051
+peer channel update -o $CORE_ORDERER_ADDRESS -c $CHANNEL_NAME -f ./channel-artifacts/Org2MSPanchors.tx --tls --cafile $CORE_ORDERER_CA
+
+peer chaincode install -n marbles02 -v 1.0 -p github.com/chaincode/marbles02/go/
+
+peer chaincode instantiate -o $CORE_ORDERER_ADDRESS --tls --cafile $CORE_ORDERER_CA -C $CHANNEL_NAME -n marbles02 -v 1.0 -c '{"Args":["init"]}'  -P "AND ('Org1MSP.peer','Org2MSP.peer')"
+
+peer chaincode invoke -o $CORE_ORDERER_ADDRESS --tls --cafile $CORE_ORDERER_CA -C $CHANNEL_NAME -n marbles02 --peerAddresses peer0.org1.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.com/peers/peer0.org1.com/tls/ca.crt --peerAddresses peer0.org2.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.com/peers/peer0.org2.com/tls/ca.crt -c '{"Args":["initMarble","marble1","blue","35","tom"]}'
+
+peer chaincode invoke -o $CORE_ORDERER_ADDRESS --tls --cafile $CORE_ORDERER_CA -C $CHANNEL_NAME -n marbles02 --peerAddresses peer0.org1.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.com/peers/peer0.org1.com/tls/ca.crt -c '{"Args":["initMarble","marble2","blue","36","bob"]}'
+
+peer chaincode query -C $CHANNEL_NAME -n marbles02 -c '{"Args":["readMarble","marble1"]}'

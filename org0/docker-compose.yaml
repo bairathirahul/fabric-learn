@@ -1,0 +1,25 @@
+version: '2'
+
+volumes:
+  orderer.org0.com:
+
+networks:
+  certification:
+
+services:
+  orderer.org0.com:
+    container_name: orderer.org0.com
+    extends:
+      file: ../base/orderer-base.yaml
+      service: orderer-base
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ../crypto-config/ordererOrganizations/org0.com/orderers/orderer.org0.com/msp:/var/hyperledger/orderer/msp
+      - ../crypto-config/ordererOrganizations/org0.com/orderers/orderer.org0.com/tls:/var/hyperledger/orderer/tls
+      - orderer.org0.com:/var/hyperledger/production/orderer
+    ports:
+      - "7050:7050"
+    networks:
+      - certification
+      

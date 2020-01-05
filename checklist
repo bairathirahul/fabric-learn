@@ -1,0 +1,18 @@
+Create a simple network
+-> Create a network with SOLO orderer and 2 organizations each having two peers -> Done
+-> Install marbles chaincode -> Done
+-> Execute the chaincode -> Done
+
+-> Practise Service Discovery commands done
+
+-> Extend the network by addding one more organization
+
+-> Upgrade the version of the chaincode
+
+-> Switch to Kafka orderer
+
+-> Switch to Raft orderer
+
+-> Switch to Couchdb ledger
+
+-> Upgrading network components

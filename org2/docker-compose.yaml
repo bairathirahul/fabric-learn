@@ -1,0 +1,88 @@
+version: '2'
+
+volumes:
+  orderer.org2.com:
+  peer0.org2.com:
+  peer1.org2.com:
+  ca.org2.com:
+
+networks:
+  certification:
+
+services:
+  peer0.org2.com:
+    container_name: peer0.org2.com
+    extends:
+      file: ../base/peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.org2.com
+      - CORE_PEER_LOCALMSPID=Org2MSP
+      - CORE_PEER_ADDRESS=peer0.org2.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.org2.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org2.com:7051
+    volumes:
+      - /var/run/:/host/var/run/      
+      - ../crypto-config/peerOrganizations/org2.com/peers/peer0.org2.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/org2.com/peers/peer0.org2.com/tls:/etc/hyperledger/fabric/tls
+      - peer0.org2.com:/var/hyperledger/production
+    ports:
+      - "9051:7051"
+    networks:
+      - certification
+
+  peer1.org2.com:
+    container_name: peer1.org2.com
+    extends:
+      file: ../base/peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.org2.com
+      - CORE_PEER_LOCALMSPID=Org2MSP
+      - CORE_PEER_ADDRESS=peer1.org2.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.org2.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org2.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.com:7051
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../crypto-config/peerOrganizations/org2.com/peers/peer1.org2.com/msp:/etc/hyperledger/fabric/msp
+      - ../crypto-config/peerOrganizations/org2.com/peers/peer1.org2.com/tls:/etc/hyperledger/fabric/tls
+      - peer1.org2.com:/var/hyperledger/production
+    ports:
+      - "10051:7051"
+    networks:
+      - certification
+
+  cli.org2.com:
+    container_name: cli.org2.com
+    extends:
+      file: ../base/cli-base.yaml
+      service: cli-base
+    environment:
+      - CORE_PEER_ID=cli.org2.com
+      - CORE_PEER_ADDRESS=peer0.org2.com:7051
+      - CORE_PEER_LOCALMSPID=Org2MSP
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.com/peers/peer0.org2.com/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.com/peers/peer0.org2.com/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.com/peers/peer0.org2.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.com/users/Admin@org2.com/msp
+      - CORE_ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/org0.com/orderers/orderer.org0.com/msp/tlscacerts/tlsca.org0.com-cert.pem
+      - CORE_ORDERER_ADDRESS=orderer.org0.com:7050
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+      - /var/run/:/host/var/run/
+      - ../chaincode:/opt/gopath/src/github.com/chaincode
+      - ../crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+      - ../scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+      - ../channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+    depends_on:
+      - peer0.org2.com
+      - peer1.org2.com
+    networks:
+      - certification
