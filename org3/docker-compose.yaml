@@ -30,7 +30,7 @@ services:
       - ../crypto-config/peerOrganizations/org3.com/peers/peer0.org3.com/tls:/etc/hyperledger/fabric/tls
       - peer0.org3.com:/var/hyperledger/production
     ports:
-      - "9051:7051"
+      - "11051:7051"
     networks:
       - certification
 
@@ -54,7 +54,7 @@ services:
       - ../crypto-config/peerOrganizations/org3.com/peers/peer1.org3.com/tls:/etc/hyperledger/fabric/tls
       - peer1.org3.com:/var/hyperledger/production
     ports:
-      - "10051:7051"
+      - "12051:7051"
     networks:
       - certification
 

@@ -50,6 +50,24 @@ Organizations:
       - Host: peer0.org2.com
         Port: 7051
 
+  - &Org3
+    Name: Org3MSP
+    ID: Org3MSP
+    MSPDir: crypto-config/peerOrganizations/org3.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('Org3MSP.admin', 'Org3MSP.peer', 'Org3MSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('Org3MSP.admin', 'Org3MSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('Org3MSP.admin')"
+    AnchorPeers:
+      - Host: peer0.org3.com
+        Port: 7051
+
 Capabilities:
   Channel: &ChannelCapabilities
     V1_4_3: true
