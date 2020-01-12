@@ -7,6 +7,50 @@ networks:
   certification:
 
 services:
+  zookeeper1.org0.com:
+    container_name: zookeeper1.org0.com
+    extends:
+      file: ../base/kafka-base.yaml
+      service: zookeeper-base
+    networks:
+      - certification
+
+  zookeeper2.org0.com:
+    container_name: zookeeper2.org0.com
+    extends:
+      file: ../base/kafka-base.yaml
+      service: zookeeper-base
+    networks:
+      - certification
+
+  kafka1.org0.com:
+    container_name: kafka1.org0.com
+    extends:
+      file: ../base/kafka-base.yaml
+      service: kafka-base
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper1.org0.com:32181,zookeeper2.org0.com:32181
+    depends_on:
+      - zookeeper1.org0.com
+      - zookeeper2.org0.com
+    networks:
+      - certification
+
+  kafka2.org0.com:
+    container_name: kafka2.org0.com
+    extends:
+      file: ../base/kafka-base.yaml
+      service: kafka-base
+    environment:
+      - KAFKA_BROKER_ID=2
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper1.org0.com:32181,zookeeper2.org0.com:32181
+    depends_on:
+      - zookeeper1.org0.com
+      - zookeeper2.org0.com
+    networks:
+      - certification
+
   orderer.org0.com:
     container_name: orderer.org0.com
     extends:
@@ -20,6 +64,9 @@ services:
       - orderer.org0.com:/var/hyperledger/production/orderer
     ports:
       - "7050:7050"
+    depends_on:
+      - kafka1.org0.com
+      - kafka2.org0.com
     networks:
       - certification
       

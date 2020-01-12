@@ -102,7 +102,7 @@ Application: &ApplicationDefaults
     <<: *ApplicationCapabilities
 
 Orderer: &OrdererDefaults
-  OrdererType: solo
+  OrdererType: kafka
   
   Addresses:
     - orderer.org0.com:7050
@@ -116,7 +116,8 @@ Orderer: &OrdererDefaults
 
   Kafka: 
     Brokers:
-      - 127.0.0.1:9092
+      - kafka1.org0.com:9092
+      - kafka2.org0.com:9092
 
   Organizations:
 
